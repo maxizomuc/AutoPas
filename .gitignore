@@ -28,3 +28,7 @@ venv/
 *.csv
 *.out
 *.log
+*.pvtu
+*.vtu
+*.txt_Rank0
+
