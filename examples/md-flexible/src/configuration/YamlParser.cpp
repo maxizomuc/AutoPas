@@ -240,13 +240,15 @@ bool MDFlexParser::YamlParser::parseYamlFile(MDFlexConfig &config) {
 
         auto strArg = node[key].as<std::string>();
         transform(strArg.begin(), strArg.end(), strArg.begin(), ::tolower);
-        if (strArg.find("avx") != std::string::npos) {
+        if (strArg.find("lennard-jones avx") != std::string::npos) {
           config.functorOption.value = MDFlexConfig::FunctorOption::lj12_6_AVX;
-        } else if (strArg.find("kokkos") != std::string::npos) {
+        } else if (strArg.find("lennard-jones kokkos") != std::string::npos) {
           config.functorOption.value = MDFlexConfig::FunctorOption::lj12_6_KOKKOS;
-        } else if (strArg.find("sve") != std::string::npos) {
+        } else if (strArg.find("ab-initio argon kokkos") != std::string::npos) {
+          config.functorOption.value = MDFlexConfig::FunctorOption::ab_in_arg_KOKKOS;
+        }else if (strArg.find("lennard-jones sve") != std::string::npos) {
           config.functorOption.value = MDFlexConfig::FunctorOption::lj12_6_SVE;
-        } else if (strArg.find("hwy") != std::string::npos or strArg.find("highway") != std::string::npos) {
+        } else if (strArg.find("lennard-jones hwy") != std::string::npos or strArg.find("highway") != std::string::npos) {
           config.functorOption.value = MDFlexConfig::FunctorOption::lj12_6_HWY;
         } else if (strArg.find("lj") != std::string::npos or strArg.find("lennard-jones") != std::string::npos) {
           config.functorOption.value = MDFlexConfig::FunctorOption::lj12_6;

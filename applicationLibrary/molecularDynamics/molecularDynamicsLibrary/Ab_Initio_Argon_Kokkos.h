@@ -78,6 +78,30 @@ class Ab_Initio_Argon_Kokkos : public autopas::PairwiseFunctor<
                          const autopas::utilsKokkos::KokkosStorage<Particle_T> &storage2, FloatPrecision &fxAcc,
                          FloatPrecision &fyAcc, FloatPrecision &fzAcc, FloatPrecision &virialSum,
                          FloatPrecision &uPotSum, FloatPrecision cutoffSquared, int i, int j) final {
+        const auto owned2 = storage2.template operator()<Particle_T::AttributeNames::ownershipState, false>(j);
+
+        // TODO: compared to the floating point ifs, this takes much more time to execute (consider having ownershipState as float with guaranteed to be exact values)
+        if (owned2 != autopas::OwnershipStateFast::dummy) {
+            const auto x2 = storage2.template operator()<Particle_T::AttributeNames::posX, false>(j);
+            const auto y2 = storage2.template operator()<Particle_T::AttributeNames::posY, false>(j);
+            const auto z2 = storage2.template operator()<Particle_T::AttributeNames::posZ, false>(j);
+
+            const FloatPrecision drX = x1 - x2;
+            const FloatPrecision drY = y1 - y2;
+            const FloatPrecision drZ = z1 - z2;
+
+            const FloatPrecision dr2 = drX * drX + drY * drY + drZ * drZ;
+
+            if (dr2 <= cutoffSquared && dr2 > 0.) {
+                //TODO: calculate ab initio potentials
+
+
+                if constexpr (calculateGlobals) {
+                    // TODO: add together
+                }
+            }
+
+        } // if owned2 is dummy
   }
 
   constexpr static auto getNeededAttr() {
