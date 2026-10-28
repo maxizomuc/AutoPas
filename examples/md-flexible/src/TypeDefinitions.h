@@ -5,7 +5,12 @@
  */
 
 #pragma once
+#include "molecularDynamicsLibrary/Ab_Initio_Argon_Kokkos.h"
+#include "molecularDynamicsLibrary/AxilrodTellerMutoFunctor.h"
+#include "molecularDynamicsLibrary/LJFunctorAVX.h"
+#include "molecularDynamicsLibrary/LJFunctorHWY.h"
 #include "molecularDynamicsLibrary/LJFunctorKokkos.h"
+#include "molecularDynamicsLibrary/LJFunctorSVE.h"
 
 #if MD_FLEXIBLE_MODE == MULTISITE
 
@@ -115,6 +120,11 @@ using MemSpace = Kokkos::HostSpace;
  */
 using LJFunctorTypeKokkos = mdLib::LJFunctorKokkos<ParticleType, true, true, autopas::FunctorN3Modes::Both,
                                                    mdFlexibleTypeDefs::calcGlobals, mdFlexibleTypeDefs::countFLOPs>;
+
+using Ab_Initio_Argon_Kokkos = mdLib::Ab_Initio_Argon_Kokkos<
+    ParticleType, false, true, autopas::FunctorN3Modes::Both, mdFlexibleTypeDefs::calcGlobals,
+    mdFlexibleTypeDefs::countFLOPs>;
+
 #endif
 
 #if defined(MD_FLEXIBLE_FUNCTOR_AVX)

@@ -205,7 +205,7 @@ class MDFlexConfig {
   /**
    * Choice of the pairwise functor
    */
-  enum class FunctorOption { none, lj12_6, lj12_6_KOKKOS, lj12_6_AVX, lj12_6_SVE, lj12_6_HWY };
+  enum class FunctorOption { none, lj12_6, lj12_6_KOKKOS, lj12_6_AVX, lj12_6_SVE, lj12_6_HWY, ab_in_arg_KOKKOS};
 
   /**
    * Choice of the Triwise functor

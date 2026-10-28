@@ -11,6 +11,7 @@
 #include "autopas/AutoPasDecl.h"
 #include "autopas/utils/WrapMPI.h"
 #include "autopas/utils/WrapOpenMP.h"
+#include "molecularDynamicsLibrary/Ab_Initio_Argon_Kokkos.h"
 
 // Declare the main AutoPas class and the computeInteractions() methods with all used functors as extern template
 // instantiation. They are instantiated in the respective cpp file inside the templateInstantiations folder.
@@ -875,6 +876,14 @@ ReturnType Simulation::applyWithChosenFunctor(FunctionType f) {
     case MDFlexConfig::FunctorOption::lj12_6_KOKKOS: {
 #ifdef AUTOPAS_ENABLE_KOKKOS
       return f(LJFunctorTypeKokkos{cutoff});
+#endif
+      throw std::runtime_error(
+          "AutoPas was not compiled with support for Kokkos and the respecitve Functors. Activate it via`cmake "
+          "-DAUTOPAS_ENABLE_KOKKOS=ON`.");
+    }
+    case MDFlexConfig::FunctorOption::ab_in_arg_KOKKOS: {
+#ifdef  AUTOPAS_ENABLE_KOKKOS
+      return f(Ab_Initio_Argon_Kokkos{cutoff});
 #endif
       throw std::runtime_error(
           "AutoPas was not compiled with support for Kokkos and the respecitve Functors. Activate it via`cmake "

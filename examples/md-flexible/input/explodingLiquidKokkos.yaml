@@ -3,7 +3,7 @@
 container                        :  [ KokkosDirectSum ]
 traversal                        :  [ ds_kokkos_flat, ds_kokkos_teams, ds_kokkos_chunks ]
 data-layout                      :  [ SoA]
-container-layout                 :  [ SoAs ]
+container-layout                 :  [ SoA ]
 #newton3                          :  [disabled, enabled]
 verlet-rebuild-frequency         :  10
 verlet-skin-radius               :  0.2
