@@ -64,5 +64,5 @@ vtk-output-folder                :  vtkOutputFolder
 no-end-config                    :  true
 log-level                        :  info
 kokkos-chunk-size                :  [64]
-kokkos-team-size                 :  [64]
+kokkos-team-size                 :  [128]
 log-file                         :  global_test_kokkos_float_teams.txt

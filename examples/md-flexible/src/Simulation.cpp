@@ -63,7 +63,7 @@ size_t getTerminalWidth() {
       break;
     }
   }
-
+  terminalWidth = 80;
   // if width is still zero try the environment variable COLUMNS
   if (terminalWidth == 0) {
     if (auto *terminalWidthCharArr = std::getenv("COLUMNS")) {
