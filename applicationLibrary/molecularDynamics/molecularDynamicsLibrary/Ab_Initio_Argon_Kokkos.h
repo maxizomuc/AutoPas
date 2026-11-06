@@ -82,12 +82,13 @@ namespace mdLib
             const double  Aexpa = A * Kokkos::exp( ((a1 * r) + (a2 * dr2) + (a_1 * inv_dr) + (a_2 * inv_dr2)) );
             innerSum = Aexpa * ((a1 * inv_dr) + (2 * a2) - (a_1 * inv_dr2 * inv_dr) - (2 * a_2 * inv_dr2 * inv_dr2));
             // TODO inv_dr for "normierung" notwendig?
-            double fac =  (innerSum - outerSum) * inv_dr;
-            i.addF(fac);
+            const double fac =  (innerSum - outerSum) * inv_dr;
+            auto f = dr * fac;
+            i.addF(f);
             if (newton3)
             {
                 //only for newton 3
-                j.subF(fac);
+                j.subF(f);
             }
 
 
