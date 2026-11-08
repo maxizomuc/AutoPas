@@ -4,13 +4,12 @@ newton3                          :  [disabled, disabled]
 verlet-rebuild-frequency         :  1
 verlet-skin-radius               :  0.2
 verlet-cluster-size              :  8
-selector-strategy                :  Fastest-Mean-Value
+selector-strategy                :  Fastest-Absolute-Value
 traversal                        :  [ ds_kokkos_teams ]
 # tuning-strategies                :  [predictive-tuning]
 tuning-interval                  :  2000
 tuning-samples                   :  4
 functor                          :  Ab-initio Argon Kokkos
-vectorization-pattern            :  [1xVectorLength, 2xVectorLengthDiv2, VectorLengthDiv2x2, VectorLengthx1]
 cutoff                           :  2
 box-min                          :  [0, 0, 0]
 box-max                          :  [70, 70, 70]
@@ -39,6 +38,6 @@ vtk-filename                     :  ExplodingCubeArgonKokkos
 vtk-write-frequency              :  200
 vtk-output-folder                :  vtkOutputFolder
 log-level                        :  info
-kokkos-chunk-size                :  [64]
+kokkos-chunk-size                :  [128]
 kokkos-team-size                 :  [128]
 log-file                         :  global_test_kokkos_float_teams.txt

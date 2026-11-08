@@ -209,7 +209,7 @@ namespace mdLib
         static constexpr FloatPrecision a_1 = 0.0275206827;
         static constexpr FloatPrecision a_2 = - 0.0101489050;
         //C_6 - C_16
-        const Kokkos::Array<FloatPrecision, 6> C_2n = {
+        static constexpr Kokkos::Array<FloatPrecision, 6> C_2n = {
             0.442812017,
             0.0326707684,
             0.00245656537,
@@ -217,7 +217,7 @@ namespace mdLib
             0.0000147012192,
             0.0000117006343
         };
-        const Kokkos::Array<FloatPrecision, 17> Fak = {
+        static constexpr Kokkos::Array<FloatPrecision, 17> Fak = {
             1., //0!
             1., //1!
             2., //2!
