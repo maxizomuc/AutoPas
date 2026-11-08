@@ -72,10 +72,10 @@ namespace mdLib
             {
                 for (int k = 0 ; k <= 2 * n ; k++)
                 {
-                    innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
-                    innerSum +=  (br * (Kokkos::pow(br, 2 * n)/Fak[(2 * n)]));
+                    innerSum +=  (pow(br, k)/Fak[k]);
+                    innerSum +=  (br * (pow(br, 2 * n)/Fak[(2 * n)]));
                 }
-                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((2 * n) + 2)))) * (2 * n - (e_br * (2 * n * innerSum)));
+                outerSum +=  ((C_2n[n-3])/(pow(r, ((2 * n) + 2)))) * (2 * n - (e_br * (2 * n * innerSum)));
 
                 innerSum = 0.;
             }
@@ -134,14 +134,13 @@ namespace mdLib
                 const auto y2 = storage2.template operator()<Particle_T::AttributeNames::posY, false>(j);
                 const auto z2 = storage2.template operator()<Particle_T::AttributeNames::posZ, false>(j);
 
-                const FloatPrecision drX = x1 - x2;
-                const FloatPrecision drY = y1 - y2;
-                const FloatPrecision drZ = z1 - z2;
+                const FloatPrecision drX = x2 - x1;
+                const FloatPrecision drY = y2 - y1;
+                const FloatPrecision drZ = z2 - z1;
 
                 const FloatPrecision dr2 = drX * drX + drY * drY + drZ * drZ;
 
                 if (dr2 <= cutoffSquared && dr2 > 0.) {
-                    //TODO: calculate ab initio potentials should be done
                     FloatPrecision fac = 0.;
                     FloatPrecision uPot = 0.;
                     ab_in_arg_pair(dr2, fac, uPot);
@@ -251,16 +250,18 @@ namespace mdLib
             FloatPrecision outerSum = 0.;
 
             FloatPrecision innerSum = 0.;
+            FloatPrecision brbrpow2ndivfak2n = 0.;
+            FloatPrecision n2 = 0.;
 
             for (int n = 3; n <= 8; n++)
             {
+                n2 = 2 * n;
+                brbrpow2ndivfak2n = br * (Kokkos::pow(br, n2)/Fak[(n2)]);
                 for (int k = 0 ; k <= 2 * n ; k++)
                 {
-                    innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
-                    innerSum +=  (br * (Kokkos::pow(br, 2 * n)/Fak[(2 * n)]));
+                    innerSum +=  (Kokkos::pow(br, k)/Fak[k]) + brbrpow2ndivfak2n;
                 }
-                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((2 * n) + 2)))) * (2 * n - (e_br * (2 * n * innerSum)));
-
+                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * (n2 * innerSum)));
                 innerSum = 0.;
             }
 
