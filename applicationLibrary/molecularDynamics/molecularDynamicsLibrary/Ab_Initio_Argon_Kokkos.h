@@ -11,6 +11,7 @@
 #include "autopas/utils/ArrayMath.h"
 #include "autopas/baseFunctors/KokkosFunctor.h"
 #include "autopas/baseFunctors/PairwiseFunctor.h"
+#include "yaml-cpp/emittermanip.h"
 
 namespace mdLib
 {
@@ -66,23 +67,23 @@ namespace mdLib
 
             FloatPrecision outerSum = 0.;
             FloatPrecision innerSum = 0.;
+
             for (int n = 3; n <= 8; n++)
             {
                 for (int k = 0 ; k <= 2 * n ; k++)
                 {
                     innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
-                    innerSum +=  (br * (Kokkos::pow(br, 2 * k)/Fak[(2 * n)]));
+                    innerSum +=  (br * (Kokkos::pow(br, 2 * n)/Fak[(2 * n)]));
                 }
-                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((2 * n) + 2)))) -e_br * (2 * n * (e_br * innerSum));
+                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((2 * n) + 2)))) * (2 * n - (e_br * (2 * n * innerSum)));
 
                 innerSum = 0.;
             }
 
             //reusing inner sum for final calculations with A*exp()
-            const double  Aexpa = A * Kokkos::exp( ((a1 * r) + (a2 * dr2) + (a_1 * inv_dr) + (a_2 * inv_dr2)) );
+            const double  Aexpa = A * exp( ((a1 * r) + (a2 * dr2) + (a_1 * inv_dr) + (a_2 * inv_dr2)) );
             innerSum = Aexpa * ((a1 * inv_dr) + (2 * a2) - (a_1 * inv_dr2 * inv_dr) - (2 * a_2 * inv_dr2 * inv_dr2));
-            // TODO inv_dr for "normierung" notwendig?
-            const double fac =  (innerSum - outerSum) * inv_dr;
+            const double fac =  (innerSum - outerSum);
             auto f = dr * fac;
             i.addF(f);
             if (newton3)
@@ -200,14 +201,15 @@ namespace mdLib
 
     private:
         FloatPrecision _cutoffSquared;
-        const FloatPrecision A = 46133014.6;
-        const FloatPrecision b = 40.2517211;
-        const FloatPrecision a1 = - 29.8337630;
-        const FloatPrecision a2 = - 9.71208881;
-        const FloatPrecision a_1 = 0.0275206827;
-        const FloatPrecision a_2 = - 0.0101489050;
+
+        static constexpr FloatPrecision A = 46133014.6;
+        static constexpr FloatPrecision b = 40.2517211;
+        static constexpr FloatPrecision a1 = - 29.8337630;
+        static constexpr FloatPrecision a2 = - 9.71208881;
+        static constexpr FloatPrecision a_1 = 0.0275206827;
+        static constexpr FloatPrecision a_2 = - 0.0101489050;
         //C_6 - C_16
-        const std::array<FloatPrecision, 6> C_2n = {
+        const Kokkos::Array<FloatPrecision, 6> C_2n = {
             0.442812017,
             0.0326707684,
             0.00245656537,
@@ -215,7 +217,7 @@ namespace mdLib
             0.0000147012192,
             0.0000117006343
         };
-        const std::array<FloatPrecision, 17> Fak = {
+        const Kokkos::Array<FloatPrecision, 17> Fak = {
             1., //0!
             1., //1!
             2., //2!
@@ -236,6 +238,7 @@ namespace mdLib
         };
 
 
+
         KOKKOS_INLINE_FUNCTION
         void ab_in_arg_pair(FloatPrecision dr2, FloatPrecision &fac, FloatPrecision &uPot)
         {
@@ -254,9 +257,9 @@ namespace mdLib
                 for (int k = 0 ; k <= 2 * n ; k++)
                 {
                     innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
-                    innerSum +=  (br * (Kokkos::pow(br, 2 * k)/Fak[(2 * n)]));
+                    innerSum +=  (br * (Kokkos::pow(br, 2 * n)/Fak[(2 * n)]));
                 }
-                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((2 * n) + 2)))) -e_br * (2 * n * (e_br * innerSum));
+                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((2 * n) + 2)))) * (2 * n - (e_br * (2 * n * innerSum)));
 
                 innerSum = 0.;
             }
@@ -264,8 +267,7 @@ namespace mdLib
             //reusing inner sum for final calculations with A*exp()
             const FloatPrecision Aexpa = A * Kokkos::exp( ((a1 * r) + (a2 * dr2) + (a_1 * inv_dr) + (a_2 * inv_dr2)) );
             innerSum = Aexpa * ((a1 * inv_dr) + (2 * a2) - (a_1 * inv_dr2 * inv_dr) - (2 * a_2 * inv_dr2 * inv_dr2));
-            // TODO inv_dr for "normierung" notwendig?
-            fac =  (innerSum - outerSum) * inv_dr;
+            fac =  (innerSum - outerSum);
             if constexpr (calculateGlobals)
             {
                 //calculate u(r)
