@@ -251,18 +251,22 @@ namespace mdLib
 
             FloatPrecision innerSum = 0.;
             FloatPrecision brbrpow2ndivfak2n = 0.;
-            FloatPrecision n2 = 0.;
-
-            for (int n = 3; n <= 8; n++)
+            FloatPrecision n2 = 6.;
+            brbrpow2ndivfak2n = br * (Kokkos::pow(br, n2)/Fak[(n2)]);
+            for (int k = 0 ; k <= 6 ; k++)
+            {
+                innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
+            }
+            outerSum += ((C_2n[0])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * (n2 * (innerSum + brbrpow2ndivfak2n))));
+            for (int n = 4; n <= 8; n++)
             {
                 n2 = 2 * n;
                 brbrpow2ndivfak2n = br * (Kokkos::pow(br, n2)/Fak[(n2)]);
-                for (int k = 0 ; k <= 2 * n ; k++)
+                for (int k = ((2 * (n - 1)) + 1) ; k <= 2 * n ; k++)
                 {
-                    innerSum +=  (Kokkos::pow(br, k)/Fak[k]) + brbrpow2ndivfak2n;
+                    innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
                 }
-                outerSum +=  ((C_2n[n-3])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * (n2 * innerSum)));
-                innerSum = 0.;
+                outerSum += ((C_2n[n-3])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * (n2 * (innerSum + brbrpow2ndivfak2n))));
             }
 
             //reusing inner sum for final calculations with A*exp()
