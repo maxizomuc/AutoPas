@@ -134,9 +134,9 @@ namespace mdLib
                 const auto y2 = storage2.template operator()<Particle_T::AttributeNames::posY, false>(j);
                 const auto z2 = storage2.template operator()<Particle_T::AttributeNames::posZ, false>(j);
 
-                const FloatPrecision drX = x2 - x1;
-                const FloatPrecision drY = y2 - y1;
-                const FloatPrecision drZ = z2 - z1;
+                const FloatPrecision drX = x1 - x2;
+                const FloatPrecision drY = y1 - y2;
+                const FloatPrecision drZ = z1 - z2;
 
                 const FloatPrecision dr2 = drX * drX + drY * drY + drZ * drZ;
 
@@ -150,6 +150,7 @@ namespace mdLib
                     fzAcc += fac * drZ;
 
                     if constexpr (calculateGlobals) {
+                        virialSum += fac * drX * drX + fac * drY * drY + fac * drZ * drZ;
                         uPotSum += uPot;
                     }
                 }
@@ -214,7 +215,7 @@ namespace mdLib
             0.00245656537,
             0.000188246247,
             0.0000147012192,
-            0.0000117006343
+            0.00000117006343
         };
         static constexpr Kokkos::Array<FloatPrecision, 17> Fak = {
             1., //0!
@@ -257,7 +258,7 @@ namespace mdLib
             {
                 innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
             }
-            outerSum += ((C_2n[0])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * (n2 * (innerSum + brbrpow2ndivfak2n))));
+            outerSum += ((C_2n[0])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * ((n2 * innerSum) + brbrpow2ndivfak2n)));
             for (int n = 4; n <= 8; n++)
             {
                 n2 = 2 * n;
@@ -266,24 +267,29 @@ namespace mdLib
                 {
                     innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
                 }
-                outerSum += ((C_2n[n-3])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * (n2 * (innerSum + brbrpow2ndivfak2n))));
+                outerSum += ((C_2n[n-3])/(Kokkos::pow(r, ((n2) + 2)))) * (n2 - (e_br * ((n2 * innerSum) + brbrpow2ndivfak2n)));
             }
 
             //reusing inner sum for final calculations with A*exp()
             const FloatPrecision Aexpa = A * Kokkos::exp( ((a1 * r) + (a2 * dr2) + (a_1 * inv_dr) + (a_2 * inv_dr2)) );
             innerSum = Aexpa * ((a1 * inv_dr) + (2 * a2) - (a_1 * inv_dr2 * inv_dr) - (2 * a_2 * inv_dr2 * inv_dr2));
-            fac =  (innerSum - outerSum);
+            fac =  - (innerSum + outerSum);
             if constexpr (calculateGlobals)
             {
-                //calculate u(r)
-                for (int n = 3; n <= 8; n++)
+                innerSum = 0.;
+                for (int k = 0 ; k <= 6 ; k++)
                 {
-                    for (int k = 0 ; k <= 2 * n ; k++)
+                    innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
+                }
+                outerSum = ((C_2n[0])/(Kokkos::pow(r, (6)))) * (1 - (e_br * innerSum)) ;
+                //calculate u(r)
+                for (int n = 4; n <= 8; n++)
+                {
+                    for (int k = ((2 * (n - 1)) + 1 ); k <= 2 * n ; k++)
                     {
                         innerSum +=  (Kokkos::pow(br, k)/Fak[k]);
                     }
-                    outerSum = ((C_2n[n-3])/(Kokkos::pow(r, (2 * n)))) - (1 - (e_br * innerSum)) ;
-                    innerSum = 0.;
+                    outerSum += ((C_2n[n-3])/(Kokkos::pow(r, (2 * n)))) * (1 - (e_br * innerSum)) ;
                 }
                 uPot = Aexpa - outerSum;
             }
